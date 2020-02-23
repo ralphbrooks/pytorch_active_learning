@@ -139,6 +139,7 @@ def get_annotations(data, default_sampling_strategy="random"):
     """
 
     ind = 0
+    # RAB - While index is less than min number of training instances needed
     while ind <= len(data):
         if ind < 0:
             ind = 0 # in case you've gone back before the first
@@ -185,9 +186,13 @@ def get_annotations(data, default_sampling_strategy="random"):
 
 def create_features(minword = 3):
     """Create indexes for one-hot encoding of words in files
-    
+
+    Indirect return: feature_index - This is a word number association
+
     """
 
+    # The first part is just a count of word frequency over all the data
+    # e.g. romans: 45 - means that there is 45 occurences of romans
     total_training_words = {}
     for item in data + training_data:
         text = item[1]
@@ -196,6 +201,8 @@ def create_features(minword = 3):
                 total_training_words[word] = 1
             else:
                 total_training_words[word] += 1
+
+    # The second part of this looks to get all of the words that is above the "minword threshold"
 
     for item in data + training_data:
         text = item[1]
@@ -220,6 +227,8 @@ class SimpleTextClassifier(nn.Module):  # inherit pytorch's nn.Module
 
     def forward(self, feature_vec):
         # Define how data is passed through the model
+
+        # clamp is saying that the result cannot be lower than 0
 
         hidden1 = self.linear1(feature_vec).clamp(min=0) # ReLU
         output = self.linear2(hidden1)
@@ -504,6 +513,7 @@ elif training_count < minimum_training_items:
     related = []
     not_related = []
 
+    # RAB - Related is the stuff that is associated with disaster
     for item in data:
         label = item[2]
         if label == "1":
@@ -518,6 +528,7 @@ else:
     # lets start Active Learning!! 
 
 	# Train new model with current training data
+    # TODO - RAB start here
     vocab_size = create_features()
     model_path = train_model(training_data, evaluation_data=evaluation_data, vocab_size=vocab_size)
 

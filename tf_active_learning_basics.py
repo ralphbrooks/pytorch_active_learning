@@ -11,16 +11,27 @@
 
 import tensorflow as tf
 
+# TODO - What is being done to set zero grad at the start of each iteration?
+
 class MyModel(tf.keras.Model):
     def __init__(self, num_labels, vocab_size):
         super(MyModel, self).__init__()
-        # Is there an assumption that there is an activation in there
-        self.dense1 = tf.keras.layers.Dense(128, activation=tf.nn.relu)
-        self.dense2 = tf.keras.layers.Dense(num_labels)
+        # TODO - validate what is coming in terms of the input
+        # TODO - is there a way to add the activation in the call so that I can keep the code similar?
 
-    def call(self, inputs):
-        x = self.dense1(inputs) #ReLU activation already part of the layer
-        return self.dense2(x)
+        # Is there an assumption that there is an activation in there
+        # The input shape of the tensor can also be added to the layer
+        self.linear1 = tf.keras.layers.Dense(128, activation=tf.nn.relu, use_bias=True, input_shape=(vocab_size, ))
+
+        # There is nothing to indicate in pytorch that
+        # the second layer has a log_softmax activation
+        self.linear2 = tf.keras.layers.Dense(num_labels)
+
+    def call(self, feature_vec):
+        x = self.linear1(feature_vec) #ReLU activation already part of the layer
+        return self.linear2(x)
+
+# What is the validation that is needed in order
 
 def train_model(training_data, validation_data = "", evaluation_data = "", num_labels=2, vocab_size=0):
 
